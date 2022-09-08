@@ -1,0 +1,29 @@
+{
+  "applications": "*",
+  "changelogDate": "20220908111406",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "application_user",
+  "fields": [],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": true,
+  "name": "ApplicationUser",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "applicationUser",
+      "ownerSide": true,
+      "relationshipName": "user",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "toDoItem",
+      "otherEntityRelationshipName": "applicationUser",
+      "relationshipName": "toDoItem",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass"
+}

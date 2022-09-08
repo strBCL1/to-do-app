@@ -1,0 +1,52 @@
+{
+  "applications": "*",
+  "changelogDate": "20220908111405",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "to_do_item",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "isCompleted",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "plannedDueDate",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "actualDueDate",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "comment",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    },
+    {
+      "fieldName": "priority",
+      "fieldType": "ToDoItemPriority",
+      "fieldValues": "HIGH,MEDIUM,LOW"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": true,
+  "name": "ToDoItem",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "applicationUser",
+      "otherEntityRelationshipName": "toDoItem",
+      "relationshipName": "applicationUser",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

@@ -1,0 +1,29 @@
+entity ToDoItem {
+    name String maxlength(100),
+	isCompleted Boolean,
+    plannedDueDate ZonedDateTime,
+    actualDueDate ZonedDateTime,
+    comment String maxlength(500),
+    priority ToDoItemPriority
+}
+
+entity ApplicationUser {}
+
+enum ToDoItemPriority {
+    HIGH,
+    MEDIUM,
+    LOW
+}
+
+relationship OneToOne {
+    ApplicationUser to User
+}
+
+relationship OneToMany {
+	ApplicationUser to ToDoItem
+}
+
+dto * with mapstruct
+paginate * with pagination
+service * with serviceClass
+filter *

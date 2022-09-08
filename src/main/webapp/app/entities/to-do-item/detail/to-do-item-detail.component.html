@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="toDoItem">
+      <h2 data-cy="toDoItemDetailsHeading"><span jhiTranslate="toDoApp.toDoItem.detail.title">To Do Item</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ toDoItem.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="toDoApp.toDoItem.name">Name</span></dt>
+        <dd>
+          <span>{{ toDoItem.name }}</span>
+        </dd>
+        <dt><span jhiTranslate="toDoApp.toDoItem.isCompleted">Is Completed</span></dt>
+        <dd>
+          <span>{{ toDoItem.isCompleted }}</span>
+        </dd>
+        <dt><span jhiTranslate="toDoApp.toDoItem.plannedDueDate">Planned Due Date</span></dt>
+        <dd>
+          <span>{{ toDoItem.plannedDueDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="toDoApp.toDoItem.actualDueDate">Actual Due Date</span></dt>
+        <dd>
+          <span>{{ toDoItem.actualDueDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="toDoApp.toDoItem.comment">Comment</span></dt>
+        <dd>
+          <span>{{ toDoItem.comment }}</span>
+        </dd>
+        <dt><span jhiTranslate="toDoApp.toDoItem.priority">Priority</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'toDoApp.ToDoItemPriority.' + toDoItem.priority }}">{{ toDoItem.priority }}</span>
+        </dd>
+        <dt><span jhiTranslate="toDoApp.toDoItem.applicationUser">Application User</span></dt>
+        <dd>
+          <div *ngIf="toDoItem.applicationUser">
+            <a [routerLink]="['/application-user', toDoItem.applicationUser.id, 'view']">{{ toDoItem.applicationUser.id }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/to-do-item', toDoItem.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>
