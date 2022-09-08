@@ -1,6 +1,7 @@
 package com.mycompany.todoapp.web.rest;
 
 import com.mycompany.todoapp.repository.ToDoItemRepository;
+import com.mycompany.todoapp.security.AuthoritiesConstants;
 import com.mycompany.todoapp.service.ToDoItemQueryService;
 import com.mycompany.todoapp.service.ToDoItemService;
 import com.mycompany.todoapp.service.criteria.ToDoItemCriteria;
@@ -15,11 +16,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -203,5 +206,12 @@ public class ToDoItemResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/users/current-user/to-do-items")
+    @Secured({ AuthoritiesConstants.USER })
+    public ResponseEntity<List<ToDoItemDTO>> currentUserToDoItems(@ParameterObject Pageable pageable) {
+        log.debug("REST request to get ToDoItems of current user");
+        return ResponseEntity.ok(toDoItemService.findAllByUserLogin(pageable));
     }
 }

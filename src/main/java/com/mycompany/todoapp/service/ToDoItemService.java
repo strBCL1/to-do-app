@@ -1,10 +1,14 @@
 package com.mycompany.todoapp.service;
 
 import com.mycompany.todoapp.domain.ToDoItem;
+import com.mycompany.todoapp.domain.User;
 import com.mycompany.todoapp.repository.ToDoItemRepository;
 import com.mycompany.todoapp.service.dto.ToDoItemDTO;
 import com.mycompany.todoapp.service.mapper.ToDoItemMapper;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -22,11 +26,13 @@ public class ToDoItemService {
     private final Logger log = LoggerFactory.getLogger(ToDoItemService.class);
 
     private final ToDoItemRepository toDoItemRepository;
+    private UserService userService;
 
     private final ToDoItemMapper toDoItemMapper;
 
-    public ToDoItemService(ToDoItemRepository toDoItemRepository, ToDoItemMapper toDoItemMapper) {
+    public ToDoItemService(ToDoItemRepository toDoItemRepository, UserService userService, ToDoItemMapper toDoItemMapper) {
         this.toDoItemRepository = toDoItemRepository;
+        this.userService = userService;
         this.toDoItemMapper = toDoItemMapper;
     }
 
@@ -108,5 +114,18 @@ public class ToDoItemService {
     public void delete(Long id) {
         log.debug("Request to delete ToDoItem : {}", id);
         toDoItemRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ToDoItemDTO> findAllByUserLogin(Pageable pageable) {
+        final User currentUser = userService
+            .getUserWithAuthorities()
+            .orElseThrow(() -> new EntityNotFoundException("Current user does not exist in database"));
+
+        return toDoItemRepository
+            .findAllByUserLogin(currentUser.getLogin(), pageable)
+            .stream()
+            .map(toDoItemMapper::toDto)
+            .collect(Collectors.toList());
     }
 }
