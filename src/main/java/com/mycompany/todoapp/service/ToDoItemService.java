@@ -1,8 +1,12 @@
 package com.mycompany.todoapp.service;
 
+import com.mycompany.todoapp.domain.ApplicationUser;
 import com.mycompany.todoapp.domain.ToDoItem;
 import com.mycompany.todoapp.domain.User;
+import com.mycompany.todoapp.repository.ApplicationUserRepository;
 import com.mycompany.todoapp.repository.ToDoItemRepository;
+import com.mycompany.todoapp.security.SecurityUtils;
+import com.mycompany.todoapp.service.dto.ToDoItemCreationDTO;
 import com.mycompany.todoapp.service.dto.ToDoItemDTO;
 import com.mycompany.todoapp.service.mapper.ToDoItemMapper;
 import java.util.List;
@@ -26,12 +30,19 @@ public class ToDoItemService {
     private final Logger log = LoggerFactory.getLogger(ToDoItemService.class);
 
     private final ToDoItemRepository toDoItemRepository;
-    private UserService userService;
+    private final ApplicationUserRepository applicationUserRepository;
+    private final UserService userService;
 
     private final ToDoItemMapper toDoItemMapper;
 
-    public ToDoItemService(ToDoItemRepository toDoItemRepository, UserService userService, ToDoItemMapper toDoItemMapper) {
+    public ToDoItemService(
+        ToDoItemRepository toDoItemRepository,
+        ApplicationUserRepository applicationUserRepository,
+        UserService userService,
+        ToDoItemMapper toDoItemMapper
+    ) {
         this.toDoItemRepository = toDoItemRepository;
+        this.applicationUserRepository = applicationUserRepository;
         this.userService = userService;
         this.toDoItemMapper = toDoItemMapper;
     }
@@ -118,14 +129,37 @@ public class ToDoItemService {
 
     @Transactional(readOnly = true)
     public List<ToDoItemDTO> findAllByUserLogin(Pageable pageable) {
-        final User currentUser = userService
-            .getUserWithAuthorities()
-            .orElseThrow(() -> new EntityNotFoundException("Current user does not exist in database"));
+        final User currentUser = getCurrentUser();
 
         return toDoItemRepository
             .findAllByUserLogin(currentUser.getLogin(), pageable)
             .stream()
             .map(toDoItemMapper::toDto)
             .collect(Collectors.toList());
+    }
+
+    private User getCurrentUser() {
+        return userService
+            .getUserWithAuthorities()
+            .orElseThrow(() -> new EntityNotFoundException("Current user does not exist in database"));
+    }
+
+    private String getCurrentUserLogin() {
+        return SecurityUtils
+            .getCurrentUserLogin()
+            .orElseThrow(() -> new EntityNotFoundException("Current user does not exist in database"));
+    }
+
+    public ToDoItemDTO createToDoItemOfCurrentUser(ToDoItemCreationDTO newToDoItemOfCurrentUserDTO) {
+        final ToDoItem newToDoItemOfCurrentUser = toDoItemMapper.toEntity(newToDoItemOfCurrentUserDTO);
+
+        final ApplicationUser currentApplicationUser = applicationUserRepository
+            .findApplicationUserByLogin(getCurrentUserLogin())
+            .orElseThrow(() -> new EntityNotFoundException("Current application user does not exist in database"));
+
+        newToDoItemOfCurrentUser.setApplicationUser(currentApplicationUser);
+        newToDoItemOfCurrentUser.setIsCompleted(false);
+
+        return toDoItemMapper.toDto(toDoItemRepository.save(newToDoItemOfCurrentUser));
     }
 }
