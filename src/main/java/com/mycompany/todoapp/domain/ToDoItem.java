@@ -5,7 +5,7 @@ import com.mycompany.todoapp.domain.enumeration.ToDoItemPriority;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 

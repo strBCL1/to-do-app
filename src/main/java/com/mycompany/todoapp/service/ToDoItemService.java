@@ -1,5 +1,7 @@
 package com.mycompany.todoapp.service;
 
+import static java.text.MessageFormat.format;
+
 import com.mycompany.todoapp.domain.ApplicationUser;
 import com.mycompany.todoapp.domain.ToDoItem;
 import com.mycompany.todoapp.domain.User;
@@ -8,6 +10,7 @@ import com.mycompany.todoapp.repository.ToDoItemRepository;
 import com.mycompany.todoapp.security.SecurityUtils;
 import com.mycompany.todoapp.service.dto.ToDoItemCreationDTO;
 import com.mycompany.todoapp.service.dto.ToDoItemDTO;
+import com.mycompany.todoapp.service.dto.ToDoItemModificationDTO;
 import com.mycompany.todoapp.service.mapper.ToDoItemMapper;
 import java.util.List;
 import java.util.Optional;
@@ -161,5 +164,28 @@ public class ToDoItemService {
         newToDoItemOfCurrentUser.setIsCompleted(false);
 
         return toDoItemMapper.toDto(toDoItemRepository.save(newToDoItemOfCurrentUser));
+    }
+
+    public Optional<ToDoItemDTO> updateExistingToDoItemOfCurrentUser(long toDoItemId, ToDoItemModificationDTO modifiedDataToDoItemDTO) {
+        final String currentUserLogin = getCurrentUserLogin();
+        return Optional.ofNullable(
+            toDoItemRepository
+                .findOneByUserLoginById(currentUserLogin, toDoItemId)
+                .map(toDoItem -> {
+                    toDoItemMapper.partialUpdate(toDoItem, modifiedDataToDoItemDTO);
+                    return toDoItemMapper.toDto(toDoItem);
+                })
+                .orElseThrow(() ->
+                    new EntityNotFoundException(
+                        format("Current user {0} does not have the to-do item of id {1}", currentUserLogin, toDoItemId)
+                    )
+                )
+        );
+        //        toDoItemToBeUpdated.setName(modifiedDataToDoItemDTO.getName());
+        //        toDoItemToBeUpdated.setActualDueDate(modifiedDataToDoItemDTO.getActualDueDate());
+        //        toDoItemToBeUpdated.setPlannedDueDate(modifiedDataToDoItemDTO.getPlannedDueDate());
+        //        toDoItemToBeUpdated.setIsCompleted(modifiedDataToDoItemDTO.getIsCompleted());
+        //        toDoItemToBeUpdated.setComment(modifiedDataToDoItemDTO.getComment());
+        //        toDoItemToBeUpdated.setPriority(modifiedDataToDoItemDTO.getPriority());
     }
 }

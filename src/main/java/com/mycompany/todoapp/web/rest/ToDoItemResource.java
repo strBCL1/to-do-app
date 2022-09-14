@@ -7,6 +7,7 @@ import com.mycompany.todoapp.service.ToDoItemService;
 import com.mycompany.todoapp.service.criteria.ToDoItemCriteria;
 import com.mycompany.todoapp.service.dto.ToDoItemCreationDTO;
 import com.mycompany.todoapp.service.dto.ToDoItemDTO;
+import com.mycompany.todoapp.service.dto.ToDoItemModificationDTO;
 import com.mycompany.todoapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -221,5 +222,20 @@ public class ToDoItemResource {
     public ResponseEntity<ToDoItemDTO> createToDoItemOfCurrentUser(@Valid @RequestBody ToDoItemCreationDTO toDoItem) {
         log.debug("REST request to post a to-do item of current user");
         return ResponseEntity.ok(toDoItemService.createToDoItemOfCurrentUser(toDoItem));
+    }
+
+    @PutMapping("/users/current-user/to-do-items/{to-do-item-id}")
+    @Secured({ AuthoritiesConstants.USER })
+    public ResponseEntity<ToDoItemDTO> updateToDoItemOfCurrentUser(
+        @Valid @RequestBody ToDoItemModificationDTO toDoItem,
+        @PathVariable("to-do-item-id") long toDoItemId
+    ) {
+        log.debug("REST request to update to-do item {} of current user", toDoItemId);
+        Optional<ToDoItemDTO> result = toDoItemService.updateExistingToDoItemOfCurrentUser(toDoItemId, toDoItem);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, toDoItem.toString())
+        );
     }
 }
