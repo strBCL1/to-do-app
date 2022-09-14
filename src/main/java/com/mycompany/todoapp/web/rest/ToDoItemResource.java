@@ -231,11 +231,20 @@ public class ToDoItemResource {
         @PathVariable("to-do-item-id") long toDoItemId
     ) {
         log.debug("REST request to update to-do item {} of current user", toDoItemId);
-        Optional<ToDoItemDTO> result = toDoItemService.updateExistingToDoItemOfCurrentUser(toDoItemId, toDoItem);
+        Optional<ToDoItemDTO> result = toDoItemService.updateToDoItemOfCurrentUser(toDoItemId, toDoItem);
 
         return ResponseUtil.wrapOrNotFound(
             result,
             HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, toDoItem.toString())
         );
+    }
+
+    @DeleteMapping("/users/current-user/to-do-items/{to-do-item-id}")
+    @Secured({ AuthoritiesConstants.USER })
+    public ResponseEntity<Void> deleteToDoItemOfCurrentUser(@PathVariable("to-do-item-id") long toDoItemId) {
+        log.debug("REST request to delete to-do item {} of current user", toDoItemId);
+        toDoItemService.deleteToDoItemOfCurrentUser(toDoItemId);
+
+        return ResponseEntity.ok().build();
     }
 }

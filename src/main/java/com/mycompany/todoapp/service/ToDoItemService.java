@@ -166,7 +166,7 @@ public class ToDoItemService {
         return toDoItemMapper.toDto(toDoItemRepository.save(newToDoItemOfCurrentUser));
     }
 
-    public Optional<ToDoItemDTO> updateExistingToDoItemOfCurrentUser(long toDoItemId, ToDoItemModificationDTO modifiedDataToDoItemDTO) {
+    public Optional<ToDoItemDTO> updateToDoItemOfCurrentUser(long toDoItemId, ToDoItemModificationDTO modifiedDataToDoItemDTO) {
         final String currentUserLogin = getCurrentUserLogin();
         return Optional.ofNullable(
             toDoItemRepository
@@ -181,11 +181,13 @@ public class ToDoItemService {
                     )
                 )
         );
-        //        toDoItemToBeUpdated.setName(modifiedDataToDoItemDTO.getName());
-        //        toDoItemToBeUpdated.setActualDueDate(modifiedDataToDoItemDTO.getActualDueDate());
-        //        toDoItemToBeUpdated.setPlannedDueDate(modifiedDataToDoItemDTO.getPlannedDueDate());
-        //        toDoItemToBeUpdated.setIsCompleted(modifiedDataToDoItemDTO.getIsCompleted());
-        //        toDoItemToBeUpdated.setComment(modifiedDataToDoItemDTO.getComment());
-        //        toDoItemToBeUpdated.setPriority(modifiedDataToDoItemDTO.getPriority());
+    }
+
+    public void deleteToDoItemOfCurrentUser(long toDoItemId) {
+        final ApplicationUser currentApplicationUser = applicationUserRepository
+            .findApplicationUserByLogin(getCurrentUserLogin())
+            .orElseThrow(() -> new EntityNotFoundException("Current application user does not exist in database"));
+
+        toDoItemRepository.deleteByIdAndApplicationUser(toDoItemId, currentApplicationUser);
     }
 }
